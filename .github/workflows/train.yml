@@ -1,4 +1,4 @@
-name: Train Wine Model
+name: Train Wine Model and Push to Docker Hub
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  train:
+  train-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -18,18 +18,27 @@ jobs:
       with:
         python-version: '3.12'
 
-    - name: Install Dependencies
+    - name: Install MLflow and Dependencies
       run: |
-        pip install -r MLProject/requirements.txt
+        pip install mlflow==2.9.2 scikit-learn pandas matplotlib
 
-    - name: Run Training Script
+    - name: Run MLflow Project
+      run: mlflow run MLProject
+
+    - name: Build Docker Image from MLflow Model
       run: |
-        python MLProject/modelling.py
+        mlflow models build-docker -m MLProject/model -n wine-model
 
-    - name: Upload Artifacts
-      uses: actions/upload-artifact@v4
+    - name: Login to Docker Hub
+      run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+    - name: Push Docker Image
+      run: |
+        docker tag wine-model ${{ secrets.DOCKER_REPO }}:latest
+        docker push ${{ secrets.DOCKER_REPO }}:latest
+
+    - name: Upload Model Artifacts
+      uses: actions/upload-artifact@v3
       with:
-        name: wine-model-artifacts
-        path: |
-          MLProject/classification_report.csv
-          MLProject/model.pkl
+        name: wine-model
+        path: artifacts/

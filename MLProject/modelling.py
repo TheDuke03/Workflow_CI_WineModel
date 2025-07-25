@@ -3,6 +3,7 @@ import mlflow.sklearn
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
+import os
 
 # Load data
 df = pd.read_csv("MLProject/namadataset_preprocessing/winequality_preprocessed.csv")
@@ -22,9 +23,13 @@ with mlflow.start_run():
     model = RandomForestClassifier()
     model.fit(X_train, y_train)
 
-    # Simpan model secara eksplisit
+    # Buat folder model output secara eksplisit
+    output_path = "MLProject/model"
+    os.makedirs(output_path, exist_ok=True)
+
+    # Simpan model ke MLProject/model agar bisa dibuild Docker
     mlflow.sklearn.log_model(
         sk_model=model,
-        artifact_path="model",  
+        artifact_path=output_path,
         registered_model_name="wine_model"
     )

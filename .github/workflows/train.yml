@@ -20,6 +20,7 @@ jobs:
 
     - name: Install MLflow and Dependencies
       run: |
+        pip install setuptools
         pip install mlflow==2.9.2 scikit-learn pandas matplotlib
 
     - name: Run MLflow Project

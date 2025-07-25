@@ -1,0 +1,3 @@
+MLflow Tracking URI: https://dagshub.com/TheDuke03/Eksperimen_SML_Muhammad-Firdaus.mlflow
+Experiment Name: Eksperimen_Wine_DagsHub
+Run Name: casual-stag-950
